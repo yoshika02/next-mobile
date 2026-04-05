@@ -17,6 +17,17 @@ import {
 } from 'lucide-react';
 
 const sleepExt: Record<number, string> = {3:'png', 9:'png', 11:'png', 13:'png'};
+const videoData: Record<string, { id: string, start?: number }> = {
+  'Social Viral Edit': { id: 'WWAwu1Pj-h4', start: 248 },
+  'Product Showcase': { id: '8BU2Y8z8MIg', start: 72 },
+  'Storytelling Edit': { id: 'eKVKOO80stg', start: 336 },
+  'Cinematic Recap':   { id: 'k7L1Eco4MLQ', start: 219 },
+  'Fast-paced Motion': { id: 'B_Z_31BJLFU' },
+  'Brand Anthem':      { id: 'bLMHeRC2msE' },
+  'YouTube Highlights': { id: 'reefflmAb2E' }
+};
+const videoItems = Object.keys(videoData);
+
 const brandImages: Record<string, string[]> = {
   Sleepycat: Array.from({ length: 18 }, (_, i) => `/brands/sleepcat/sleepcat_${i + 1}.${sleepExt[i + 1] ?? 'jpg'}`),
   MomCozy:  Array.from({ length: 17 }, (_, i) => `/brands/momcozy/momcozy_${i + 1}.jpg`),
@@ -26,15 +37,22 @@ const brandImages: Record<string, string[]> = {
   'MomCozy_logo': ['/brands/logos/momcozy_logo_1.png', '/brands/logos/momcozy_logo_2.png'],
   'Optm_logo': ['/brands/logos/optm_logo.png'],
   'Varco_logo': ['/brands/logos/varco_logo.avif'],
+  'Pen and paper': ['/brands/thumbnails/35 MCQ is not enough.jpg', '/brands/thumbnails/AI bdhayega NEET Score!.jpg'],
+  'Coworker wisdom': ['/brands/thumbnails/First Win 2 jpg.jpg', '/brands/thumbnails/NEET 2026 .jpg'],
+  'Multi-role explainer': ['/brands/thumbnails/Stuck in Chemistry .jpg', '/brands/thumbnails/Stuck in Physcis .jpg'],
+  'Explain like I\'m five': ['/brands/thumbnails/Thumbnail 3.jpg', '/brands/thumbnails/_Only way to solve MCQs!! 2.jpg'],
 };
 
-export default function VidcluePage() {
+export default function VidclueFinalPage() {
   const [isOn, setIsOn] = useState(true);
   const [activeCategory, setActiveCategory] = useState<'ALL' | 'BKM' | 'MOR'>('ALL');
   const [currentIndex, setCurrentIndex] = useState(0); 
   const [isSocialAdsOpen, setIsSocialAdsOpen] = useState(true);
   const [isThumbnailsOpen, setIsThumbnailsOpen] = useState(true);
-  const [isLogosOpen, setIsLogosOpen] = useState(true);
+  const [isVideosOpen, setIsVideosOpen] = useState(true);
+  const [isLogosOpen, setIsLogosOpen] = useState(false);
+  const [viewAllCategory, setViewAllCategory] = useState<null | 'social' | 'thumbnails' | 'videos' | 'logos'>(null);
+  const [logoSlideIndex, setLogoSlideIndex] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
   const [viewMode, setViewMode] = useState<'DYNAMIC' | 'STATIC'>('DYNAMIC');
 
@@ -47,15 +65,28 @@ export default function VidcluePage() {
     'Coworker wisdom', 
     'Multi-role explainer', 
     'Explain like I\'m five', 
-    'Sleepycat', 
-    'MomCozy',   
-    'Optm',      
-    'Varco'      
+    ...videoItems
   ];
 
   const currentBrand = items[currentIndex];
-  const itemKey = currentIndex >= 8 ? `${currentBrand}_logo` : currentBrand;
-  const currentBrandImgs = brandImages[itemKey];
+  
+  // Aggregate images if in "Show All" mode
+  const currentBrandImgs = (() => {
+    if (viewAllCategory === 'social') return items.slice(0, 4).flatMap(it => brandImages[it] || []);
+    if (viewAllCategory === 'thumbnails') return items.slice(4, 8).flatMap(it => brandImages[it] || []);
+    if (viewAllCategory === 'videos') return items.slice(8).flatMap(it => [`https://img.youtube.com/vi/${videoData[it].id}/mqdefault.jpg`]);
+    if (viewAllCategory === 'logos') return ['Sleepycat', 'MomCozy', 'Optm', 'Varco'].flatMap(it => brandImages[`${it}_logo`] || []);
+    const itemKey = currentIndex >= 8 ? currentBrand : currentBrand;
+    return brandImages[itemKey];
+  })();
+
+  const currentDisplayName = (() => {
+    if (viewAllCategory === 'social') return "ALL SOCIAL + ADS";
+    if (viewAllCategory === 'thumbnails') return "ALL THUMBNAILS";
+    if (viewAllCategory === 'videos') return "ALL VIDEOS";
+    if (viewAllCategory === 'logos') return "ALL PARTNERS";
+    return currentBrand;
+  })();
 
   useEffect(() => { setSlideIndex(0); }, [currentIndex]);
 
@@ -66,6 +97,14 @@ export default function VidcluePage() {
     }, 3000);
     return () => clearInterval(timer);
   }, [currentIndex, currentBrandImgs, viewMode]);
+
+  useEffect(() => {
+    if (!isOn) return;
+    const timer = setInterval(() => {
+      setLogoSlideIndex(prev => (prev < 3 ? prev + 1 : 0));
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [isOn]);
 
   const toggleCategory = (cat: 'ALL' | 'BKM' | 'MOR') => {
     if (!isOn) return;
@@ -116,6 +155,7 @@ export default function VidcluePage() {
           <div>
             <h1 className="text-white text-2xl font-black tracking-tight drop-shadow-sm">SUNIL</h1>
             <p className="text-white/70 text-[9px] font-bold tracking-[0.2em] uppercase mt-0.5">Graphic Desginer & Video Editor</p>
+            <p className="text-white/50 text-[10px] font-medium tracking-widest mt-1">sunildesign.co@gmail.com</p>
           </div>
 
           <div className="flex gap-5 mr-[4.5rem]">
@@ -174,27 +214,34 @@ export default function VidcluePage() {
                 <div className="flex-1 overflow-y-auto scrollbar-hide pb-4 relative">
                   {isSocialAdsOpen && items.slice(0, 4).map((item, idx) => {
                     const isActive = currentIndex === idx;
+                    const previewImg = brandImages[item]?.[0];
                     return (
                       <button
                         key={idx}
-                        onClick={() => setCurrentIndex(idx)}
-                        className={`w-full text-left px-6 py-4 transition-all relative flex items-center gap-4 group ${
-                          isActive ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
+                        onClick={() => { setCurrentIndex(idx); setViewAllCategory(null); }}
+                        className={`w-full text-left px-6 py-3 transition-all relative flex items-center gap-4 group ${
+                          isActive && !viewAllCategory ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
                         }`}
                       >
-                        <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-yellow-400 shadow-[0_0_6px_#facc15]' : 'bg-white/20'}`} />
-                        <span className="text-sm font-medium tracking-wide">{item}</span>
-                        {isActive && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#e03e3e]" />}
+                        {previewImg ? (
+                          <div className={`w-10 h-7 rounded border border-white/10 overflow-hidden relative shrink-0 ${(isActive && !viewAllCategory) ? 'ring-1 ring-yellow-400/50' : ''}`}>
+                            <Image src={previewImg} alt="" fill className="object-cover" sizes="40px" />
+                          </div>
+                        ) : (
+                          <div className={`w-1.5 h-1.5 rounded-full ${(isActive && !viewAllCategory) ? 'bg-yellow-400 shadow-[0_0_6px_#facc15]' : 'bg-white/20'}`} />
+                        )}
+                        <span className="text-xs font-medium tracking-wide truncate">{item}</span>
+                        {(isActive && !viewAllCategory) && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#e03e3e]" />}
                       </button>
                     );
                   })}
 
                   <div 
-                    className="p-5 flex items-center justify-between mt-2 border-t border-white/5 bg-[#1a1a1a] cursor-pointer hover:bg-white/5 transition"
-                    onClick={() => setIsThumbnailsOpen(!isThumbnailsOpen)}
+                    className={`p-5 flex items-center justify-between mt-2 border-t border-white/5 bg-[#1a1a1a] cursor-pointer hover:bg-white/5 transition ${viewAllCategory === 'thumbnails' ? 'ring-inset ring-1 ring-yellow-500/30' : ''}`}
+                    onClick={() => { setIsThumbnailsOpen(!isThumbnailsOpen); setViewAllCategory('thumbnails'); }}
                   >
                     <div className="flex items-center gap-2">
-                      <div className="text-white/50 text-[10px] font-bold tracking-widest uppercase">2. THUMBNAILS</div>
+                      <div className={`text-[10px] font-bold tracking-widest uppercase ${viewAllCategory === 'thumbnails' ? 'text-yellow-400' : 'text-white/50'}`}>2. THUMBNAILS</div>
                       {isThumbnailsOpen ? <ChevronUp size={14} className="text-white/40" /> : <ChevronDown size={14} className="text-white/40" />}
                     </div>
                   </div>
@@ -202,69 +249,120 @@ export default function VidcluePage() {
                   {isThumbnailsOpen && items.slice(4, 8).map((item, idx) => {
                     const actualIdx = idx + 4;
                     const isActive = currentIndex === actualIdx;
+                    const previewImg = brandImages[item]?.[0];
                     return (
                       <button
                         key={actualIdx}
-                        onClick={() => setCurrentIndex(actualIdx)}
-                        className={`w-full text-left px-6 py-4 transition-all relative flex items-center gap-4 group ${
-                          isActive ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
+                        onClick={() => { setCurrentIndex(actualIdx); setViewAllCategory(null); }}
+                        className={`w-full text-left px-6 py-3 transition-all relative flex items-center gap-4 group ${
+                          isActive && !viewAllCategory ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
                         }`}
                       >
-                        <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-yellow-400' : 'bg-white/20'}`} />
-                        <span className="text-sm font-medium tracking-wide">{item}</span>
-                        {isActive && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#e03e3e]" />}
+                        {previewImg ? (
+                          <div className={`w-10 h-7 rounded border border-white/10 overflow-hidden relative shrink-0 ${(isActive && !viewAllCategory) ? 'ring-1 ring-yellow-400/50' : ''}`}>
+                            <Image src={previewImg} alt="" fill className="object-cover" sizes="40px" />
+                          </div>
+                        ) : (
+                          <div className={`w-1.5 h-1.5 rounded-full ${(isActive && !viewAllCategory) ? 'bg-yellow-400 shadow-[0_0_6px_#facc15]' : 'bg-white/20'}`} />
+                        )}
+                        <span className="text-xs font-medium tracking-wide truncate">{item}</span>
+                        {(isActive && !viewAllCategory) && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#e03e3e]" />}
                       </button>
                     );
                   })}
 
                   <div 
-                    className="p-5 flex items-center justify-between mt-2 border-t border-white/5 bg-[#1a1a1a] cursor-pointer hover:bg-white/5 transition"
-                    onClick={() => setIsLogosOpen(!isLogosOpen)}
+                    className={`p-5 flex items-center justify-between mt-2 border-t border-white/5 bg-[#1a1a1a] cursor-pointer hover:bg-white/5 transition ${viewAllCategory === 'videos' ? 'ring-inset ring-1 ring-yellow-500/30' : ''}`}
+                    onClick={() => { setIsVideosOpen(!isVideosOpen); setViewAllCategory('videos'); }}
                   >
                     <div className="flex items-center gap-2">
-                      <div className="text-white/50 text-[10px] font-bold tracking-widest uppercase">3. LOGOS</div>
-                      {isLogosOpen ? <ChevronUp size={14} className="text-white/40" /> : <ChevronDown size={14} className="text-white/40" />}
+                      <div className={`text-[10px] font-bold tracking-widest uppercase ${viewAllCategory === 'videos' ? 'text-yellow-400' : 'text-white/50'}`}>3. VIDEOS</div>
+                      {isVideosOpen ? <ChevronUp size={14} className="text-white/40" /> : <ChevronDown size={14} className="text-white/40" />}
                     </div>
                   </div>
-                  
-                  {isLogosOpen && items.slice(8).map((item, idx) => {
+
+                  {isVideosOpen && items.slice(8).map((item, idx) => {
                     const actualIdx = idx + 8;
                     const isActive = currentIndex === actualIdx;
+                    const vid = videoData[item];
+                    const previewImg = `https://img.youtube.com/vi/${vid.id}/mqdefault.jpg`;
                     return (
                       <button
                         key={actualIdx}
-                        onClick={() => setCurrentIndex(actualIdx)}
-                        className={`w-full text-left px-6 py-4 transition-all relative flex items-center gap-4 group ${
-                          isActive ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
+                        onClick={() => { setCurrentIndex(actualIdx); setViewAllCategory(null); }}
+                        className={`w-full text-left px-6 py-3 transition-all relative flex items-center gap-4 group ${
+                          isActive && !viewAllCategory ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
                         }`}
                       >
-                        <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-yellow-400' : 'bg-white/20'}`} />
-                        <span className="text-sm font-medium tracking-wide">{item}</span>
-                        {isActive && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#e03e3e]" />}
+                        <div className={`w-10 h-7 rounded border border-white/10 overflow-hidden relative shrink-0 ${(isActive && !viewAllCategory) ? 'ring-1 ring-yellow-400/50' : ''}`}>
+                          <Image src={previewImg} alt="" fill className="object-cover" unoptimized />
+                        </div>
+                        <span className="text-xs font-medium tracking-wide truncate">{item}</span>
+                        {(isActive && !viewAllCategory) && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#e03e3e]" />}
                       </button>
                     );
                   })}
                 </div>
+
+                {/* Constant Logo Slideshow at Bottom */}
+                <div className="mt-auto border-t border-white/10 bg-black/40 p-4">
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <span className="text-[10px] font-black tracking-widest text-white/40 uppercase">Trusted by</span>
+                    <div className="flex gap-1">
+                      {[0, 1, 2, 3].map(i => (
+                        <div key={i} className={`w-1 h-1 rounded-full ${i === logoSlideIndex ? 'bg-yellow-400' : 'bg-white/10'}`} />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="relative h-14 w-full overflow-hidden rounded-xl bg-white border border-white/10 flex items-center justify-center shadow-inner">
+                    {(() => {
+                      const logoItems = ['Sleepycat', 'MomCozy', 'Optm', 'Varco'];
+                      const item = logoItems[logoSlideIndex];
+                      const logoImg = brandImages[`${item}_logo`]?.[0];
+                      if (!logoImg) return null;
+                      const isOptm = item === 'Optm';
+                      return (
+                        <div key={item} className={`absolute inset-0 flex items-center justify-center animate-fadeIn p-2 ${isOptm ? 'bg-[#1a1a1a]' : ''}`}>
+                          <div className={`relative w-full h-full ${isOptm ? 'scale-125' : ''}`}>
+                             <Image src={logoImg} alt={item} fill className="object-contain drop-shadow-[0_0_1px_rgba(0,0,0,0.3)]" sizes="150px" />
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
              </div>
           </div>
 
-          {/* Right Screen Area */}
           <div className={`flex-1 rounded-2xl overflow-hidden flex flex-col border-2 border-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.2)] transition-colors duration-300 relative ${isOn ? 'bg-[#e0e0e0]' : 'bg-[#1a1a1a]'}`}>
             <div className={`h-full flex flex-col relative transition-opacity duration-300 z-0 ${isOn ? 'opacity-100' : 'opacity-0'}`}>
               <div className="h-14 bg-[#151515] flex items-center justify-between px-5 shrink-0">
                 <div className="flex items-center gap-3 text-white">
-                  <span className="text-[11px] font-bold tracking-widest uppercase opacity-90">{items[currentIndex]}</span>
-                  <span className="text-[11px] text-white/30">{slideIndex + 1}/{currentBrandImgs?.length ?? '—'}</span>
-                </div>
-                <div className="flex gap-4 text-white/40">
-                   <Bookmark size={16} />
-                   <MoreVertical size={16} />
+                  <span className="text-[11px] font-bold tracking-widest uppercase opacity-90">{currentDisplayName}</span>
+                  <span className="text-[11px] text-white/30">{viewAllCategory ? 'GRID' : `${slideIndex + 1}/${currentBrandImgs?.length ?? '—'}`}</span>
                 </div>
               </div>
 
               <div className="flex-1 relative bg-[#111] shadow-inner overflow-hidden flex items-center justify-center pointer-events-auto">
                 {(() => {
                   const imgs = currentBrandImgs;
+                  
+                  // Check if current item is a video
+                  if (!viewAllCategory && currentIndex >= 8) {
+                    const vid = videoData[items[currentIndex]];
+                    return (
+                      <div className="w-full h-full relative p-4">
+                        <iframe 
+                          src={`https://www.youtube.com/embed/${vid.id}?start=${vid.start || 0}&autoplay=0&rel=0`}
+                          title={items[currentIndex]}
+                          className="w-full h-full rounded-xl border-4 border-black/20 shadow-2xl"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                          allowFullScreen
+                        />
+                      </div>
+                    );
+                  }
+
                   if (!imgs || imgs.length === 0) {
                     return (
                       <div className="h-full flex flex-col items-center justify-center">
@@ -274,28 +372,23 @@ export default function VidcluePage() {
                     );
                   }
 
-                  if (viewMode === 'STATIC') {
+                  if (viewMode === 'STATIC' || viewAllCategory) {
                     return (
                       <div className="h-full w-full overflow-y-auto scrollbar-hide p-6 flex flex-col gap-6 relative group/static">
-                        {imgs.map((src, i) => (
-                          <div key={i} className="relative w-full aspect-video rounded-lg overflow-hidden border border-white/10 shadow-lg shrink-0">
-                            <Image src={src} alt={currentBrand} fill className="object-cover" />
+                        {imgs.map((imgSrc, i) => (
+                          <div key={`${imgSrc}-${i}`} className="relative w-full aspect-video rounded-lg overflow-hidden border border-white/10 shadow-lg shrink-0">
+                            <Image src={imgSrc} alt="" fill className="object-cover" />
                           </div>
                         ))}
-                        <div className="sticky bottom-0 left-0 right-0 flex justify-center pb-2 pointer-events-none">
-                           <div className="bg-yellow-400 text-black px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-xl animate-bounce">
-                              SCROLL TO SEE MORE
-                           </div>
-                        </div>
                       </div>
                     );
                   }
 
-                  const src = imgs[slideIndex];
+                  const activeSrc = imgs[slideIndex];
                   return (
                     <div className="relative w-full h-full flex items-center justify-center">
-                      <div key={src} className="absolute inset-0 animate-fadeIn">
-                        <Image src={src} alt={`${currentBrand} ${slideIndex + 1}`} fill className="object-contain" sizes="600px" priority />
+                      <div key={activeSrc} className="absolute inset-0 animate-fadeIn">
+                        <Image src={activeSrc} alt={`${currentBrand} ${slideIndex + 1}`} fill className="object-contain" sizes="600px" priority />
                       </div>
                       {imgs.length > 1 && (
                         <>
@@ -303,11 +396,6 @@ export default function VidcluePage() {
                           <button onClick={() => setSlideIndex(i => (i < imgs.length - 1 ? i + 1 : 0))} className="absolute right-3 z-[100] w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 flex items-center justify-center text-white pointer-events-auto"><ChevronRight size={18} /></button>
                         </>
                       )}
-                      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
-                        {imgs.map((_, i) => (
-                          <button key={i} onClick={() => setSlideIndex(i)} className={`w-1.5 h-1.5 rounded-full transition-all ${i === slideIndex ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/60'}`} />
-                        ))}
-                      </div>
                     </div>
                   );
                 })()}
@@ -315,7 +403,6 @@ export default function VidcluePage() {
             </div>
           </div>
 
-          {/* Right Navigation Strip */}
           <div className="w-16 flex flex-col items-center py-2 gap-5 ml-2 relative z-[100] pb-6">
             <button onClick={() => setIsOn(!isOn)} className="w-11 h-11 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] border border-black/40 shadow-[0_4px_6px_rgba(0,0,0,0.4)] flex items-center justify-center pointer-events-auto">
               <Power size={18} className={`transition-colors duration-300 ${isOn ? 'text-white' : 'text-white/30'}`} />
