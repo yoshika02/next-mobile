@@ -1,0 +1,12 @@
+
+node_modules
+.next
+.next_clean
+.next_custom
+out
+build
+.env*.local
+.vercel
+*.log
+.DS_Store
+
