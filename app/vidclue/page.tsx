@@ -228,7 +228,7 @@ export default function VidclueFinalPage() {
                   return (
                     <div key={item} className={`absolute inset-0 flex items-center justify-center animate-fadeIn p-1 ${isOptm ? 'bg-[#1a1a1a]' : ''}`}>
                       <div className={`relative w-full h-full ${isOptm ? 'scale-125' : ''}`}>
-                        <Image src={logoImg} alt={item} fill className="object-contain" sizes="160px" />
+                        <Image src={logoImg} alt={item} fill className="object-contain" sizes="160px" unoptimized />
                       </div>
                     </div>
                   );
@@ -457,7 +457,7 @@ export default function VidclueFinalPage() {
                           onClick={() => setExpandedInline(null)}
                           className="relative aspect-square rounded-lg overflow-hidden border border-white/10 cursor-pointer hover:border-yellow-400/50 transition"
                         >
-                          <Image src={imgSrc} alt="" fill className="object-cover" sizes="120px" />
+                          <Image src={imgSrc} alt="" fill className="object-cover" sizes="120px" unoptimized />
                         </div>
                       ));
                     })()}
@@ -499,7 +499,7 @@ export default function VidclueFinalPage() {
                       <div className="h-full w-full overflow-y-auto scrollbar-hide p-6 flex flex-col gap-6 relative group/static">
                         {imgs.map((imgSrc, i) => (
                           <div key={`${imgSrc}-${i}`} className="relative w-full aspect-video rounded-lg overflow-hidden border border-white/10 shadow-lg shrink-0">
-                            <Image src={imgSrc} alt="" fill className="object-cover" />
+                            <Image src={imgSrc} alt="" fill className="object-cover" unoptimized />
                           </div>
                         ))}
                       </div>
@@ -569,6 +569,6 @@ export default function VidclueFinalPage() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
