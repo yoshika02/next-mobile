@@ -412,7 +412,7 @@ export default function VidclueFinalPage() {
                     return (
                       <div key={item} className={`absolute inset-0 flex items-center justify-center animate-fadeIn p-2 ${isOptm ? 'bg-[#1a1a1a]' : ''}`}>
                         <div className={`relative w-full h-full ${isOptm ? 'scale-125' : ''}`}>
-                          <Image src={logoImg} alt={item} fill className="object-contain drop-shadow-[0_0_1px_rgba(0,0,0,0.3)]" sizes="150px" />
+                          <Image src={logoImg} alt={item} fill className="object-contain drop-shadow-[0_0_1px_rgba(0,0,0,0.3)]" sizes="150px" unoptimized />
                         </div>
                       </div>
                     );
