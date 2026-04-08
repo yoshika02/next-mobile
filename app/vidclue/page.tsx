@@ -415,7 +415,7 @@ export default function VidclueFinalPage() {
 
               {/* Inline Grid Display for Double-Click Expand */}
               {expandedInline && (
-                <div className="bg-[#111] shadow-inner overflow-y-auto border-b border-white/10 p-4">
+                <div className="bg-[#111] shadow-inner overflow-y-auto border-b border-white/10 p-4 max-h-[120px] md:max-h-[180px]">
                   <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                     {(() => {
                       let gridItems: string[] = [];
