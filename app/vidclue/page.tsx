@@ -52,9 +52,11 @@ export default function VidclueFinalPage() {
   const [isVideosOpen, setIsVideosOpen] = useState(true);
   const [isLogosOpen, setIsLogosOpen] = useState(false);
   const [viewAllCategory, setViewAllCategory] = useState<null | 'social' | 'thumbnails' | 'videos' | 'logos'>(null);
+  const [expandedInline, setExpandedInline] = useState<null | 'social' | 'thumbnails' | 'videos'>(null);
   const [logoSlideIndex, setLogoSlideIndex] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
   const [viewMode, setViewMode] = useState<'DYNAMIC' | 'STATIC'>('DYNAMIC');
+  const [lastClickTime, setLastClickTime] = useState(0);
 
   const items = [
     'Sleepycat',
@@ -256,10 +258,20 @@ export default function VidclueFinalPage() {
                 {isSocialAdsOpen && items.slice(0, 4).map((item, idx) => {
                   const isActive = currentIndex === idx;
                   const previewImg = brandImages[item]?.[0];
+                  const handleClick = () => {
+                    const now = Date.now();
+                    if (now - lastClickTime < 300) {
+                      setExpandedInline(expandedInline === 'social' ? null : 'social');
+                    } else {
+                      setCurrentIndex(idx);
+                      setViewAllCategory(null);
+                    }
+                    setLastClickTime(now);
+                  };
                   return (
                     <button
                       key={idx}
-                      onClick={() => { setCurrentIndex(idx); setViewAllCategory(null); }}
+                      onClick={handleClick}
                       className={`w-full text-left px-6 py-3 transition-all relative flex items-center gap-4 group ${isActive && !viewAllCategory ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
                         }`}
                     >
@@ -290,10 +302,20 @@ export default function VidclueFinalPage() {
                   const actualIdx = idx + 4;
                   const isActive = currentIndex === actualIdx;
                   const previewImg = brandImages[item]?.[0];
+                  const handleClick = () => {
+                    const now = Date.now();
+                    if (now - lastClickTime < 300) {
+                      setExpandedInline(expandedInline === 'thumbnails' ? null : 'thumbnails');
+                    } else {
+                      setCurrentIndex(actualIdx);
+                      setViewAllCategory(null);
+                    }
+                    setLastClickTime(now);
+                  };
                   return (
                     <button
                       key={actualIdx}
-                      onClick={() => { setCurrentIndex(actualIdx); setViewAllCategory(null); }}
+                      onClick={handleClick}
                       className={`w-full text-left px-6 py-3 transition-all relative flex items-center gap-4 group ${isActive && !viewAllCategory ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
                         }`}
                     >
@@ -325,10 +347,20 @@ export default function VidclueFinalPage() {
                   const isActive = currentIndex === actualIdx;
                   const vid = videoData[item];
                   const previewImg = `https://img.youtube.com/vi/${vid.id}/mqdefault.jpg`;
+                  const handleClick = () => {
+                    const now = Date.now();
+                    if (now - lastClickTime < 300) {
+                      setExpandedInline(expandedInline === 'videos' ? null : 'videos');
+                    } else {
+                      setCurrentIndex(actualIdx);
+                      setViewAllCategory(null);
+                    }
+                    setLastClickTime(now);
+                  };
                   return (
                     <button
                       key={actualIdx}
-                      onClick={() => { setCurrentIndex(actualIdx); setViewAllCategory(null); }}
+                      onClick={handleClick}
                       className={`w-full text-left px-6 py-3 transition-all relative flex items-center gap-4 group ${isActive && !viewAllCategory ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
                         }`}
                     >
@@ -380,6 +412,29 @@ export default function VidclueFinalPage() {
                   <span className="text-[11px] text-white/30">{viewAllCategory ? 'GRID' : `${slideIndex + 1}/${currentBrandImgs?.length ?? '—'}`}</span>
                 </div>
               </div>
+
+              {/* Inline Grid Display for Double-Click Expand */}
+              {expandedInline && (
+                <div className="bg-[#111] shadow-inner overflow-y-auto border-b border-white/10 p-4">
+                  <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                    {(() => {
+                      let gridItems: string[] = [];
+                      if (expandedInline === 'social') gridItems = items.slice(0, 4).flatMap(it => brandImages[it] || []);
+                      if (expandedInline === 'thumbnails') gridItems = items.slice(4, 8).flatMap(it => brandImages[it] || []);
+                      if (expandedInline === 'videos') gridItems = items.slice(8).flatMap(it => [`https://img.youtube.com/vi/${videoData[it].id}/mqdefault.jpg`]);
+                      return gridItems.map((imgSrc, i) => (
+                        <div
+                          key={`${imgSrc}-${i}`}
+                          onClick={() => setExpandedInline(null)}
+                          className="relative aspect-square rounded-lg overflow-hidden border border-white/10 cursor-pointer hover:border-yellow-400/50 transition"
+                        >
+                          <Image src={imgSrc} alt="" fill className="object-cover" sizes="120px" />
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </div>
+              )}
 
               <div className="flex-1 relative bg-[#111] shadow-inner overflow-hidden flex items-center justify-center pointer-events-auto">
                 {(() => {
