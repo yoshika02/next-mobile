@@ -510,7 +510,7 @@ export default function VidclueFinalPage() {
                   return (
                     <div className="relative w-full h-full flex items-center justify-center">
                       <div key={activeSrc} className="absolute inset-0 animate-fadeIn">
-                        <Image src={activeSrc} alt={`${currentBrand} ${slideIndex + 1}`} fill className="object-contain" sizes="600px" priority />
+                        <Image src={activeSrc} alt={`${currentBrand} ${slideIndex + 1}`} fill className="object-contain" sizes="(max-width: 768px) 100vw, 600px" priority unoptimized />
                       </div>
                       {imgs.length > 1 && (
                         <>
