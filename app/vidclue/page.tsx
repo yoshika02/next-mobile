@@ -183,7 +183,7 @@ export default function VidclueFinalPage() {
                   </button>
                 );
               })}
-            </div>}
+            </div>
 
             <button
               onClick={() => isOn && setViewMode(prev => prev === 'DYNAMIC' ? 'STATIC' : 'DYNAMIC')}
