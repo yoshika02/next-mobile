@@ -265,6 +265,12 @@ export default function VidclueFinalPage() {
                     } else {
                       setCurrentIndex(idx);
                       setViewAllCategory(null);
+                      // Close all sidebar sections on mobile
+                      if (window.innerWidth < 768) {
+                        setIsSocialAdsOpen(false);
+                        setIsThumbnailsOpen(false);
+                        setIsVideosOpen(false);
+                      }
                     }
                     setLastClickTime(now);
                   };
@@ -309,6 +315,12 @@ export default function VidclueFinalPage() {
                     } else {
                       setCurrentIndex(actualIdx);
                       setViewAllCategory(null);
+                      // Close all sidebar sections on mobile
+                      if (window.innerWidth < 768) {
+                        setIsSocialAdsOpen(false);
+                        setIsThumbnailsOpen(false);
+                        setIsVideosOpen(false);
+                      }
                     }
                     setLastClickTime(now);
                   };
@@ -354,6 +366,12 @@ export default function VidclueFinalPage() {
                     } else {
                       setCurrentIndex(actualIdx);
                       setViewAllCategory(null);
+                      // Close all sidebar sections on mobile
+                      if (window.innerWidth < 768) {
+                        setIsSocialAdsOpen(false);
+                        setIsThumbnailsOpen(false);
+                        setIsVideosOpen(false);
+                      }
                     }
                     setLastClickTime(now);
                   };
@@ -419,9 +437,20 @@ export default function VidclueFinalPage() {
                   <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                     {(() => {
                       let gridItems: string[] = [];
-                      if (expandedInline === 'social') gridItems = items.slice(0, 4).flatMap(it => brandImages[it] || []);
-                      if (expandedInline === 'thumbnails') gridItems = items.slice(4, 8).flatMap(it => brandImages[it] || []);
-                      if (expandedInline === 'videos') gridItems = items.slice(8).flatMap(it => [`https://img.youtube.com/vi/${videoData[it].id}/mqdefault.jpg`]);
+                      const currentItem = items[currentIndex];
+
+                      // Show images only from the CURRENTLY selected item, not all items in category
+                      if (expandedInline === 'social' && currentIndex < 4) {
+                        gridItems = brandImages[currentItem] || [];
+                      }
+                      if (expandedInline === 'thumbnails' && currentIndex >= 4 && currentIndex < 8) {
+                        gridItems = brandImages[currentItem] || [];
+                      }
+                      if (expandedInline === 'videos' && currentIndex >= 8) {
+                        const vid = videoData[currentItem];
+                        gridItems = vid ? [`https://img.youtube.com/vi/${vid.id}/mqdefault.jpg`] : [];
+                      }
+
                       return gridItems.map((imgSrc, i) => (
                         <div
                           key={`${imgSrc}-${i}`}
