@@ -150,26 +150,65 @@ export default function VidclueFinalPage() {
           ></div>
         </div>
 
-        {/* --- Top Control Bar --- */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2 md:mb-4 px-1 md:px-2 relative z-[110] pointer-events-auto gap-2 md:gap-0 w-full md:w-auto">
-          <div className="block md:block">
-            <h1 className="text-white text-xl md:text-2xl font-black tracking-tight drop-shadow-sm">SUNIL</h1>
-            <p className="text-white/70 text-[8px] md:text-[9px] font-bold tracking-[0.2em] uppercase mt-0.5 hidden md:block">Graphic Desginer & Video Editor</p>
-            <p className="text-white/50 text-[9px] md:text-[10px] font-medium tracking-widest mt-1 hidden md:block">sunildesign.co@gmail.com</p>
+        {/* --- Mobile Top Controls --- */}
+        <div className="flex md:hidden flex-col gap-2 w-full mb-2">
+          {/* Power & Mode + Counter */}
+          <div className="flex gap-2 items-center w-full px-1 relative z-[110] pointer-events-auto">
+            <button onClick={() => setIsOn(!isOn)} className="w-9 h-9 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] border border-black/40 shadow-[0_4px_6px_rgba(0,0,0,0.4)] flex items-center justify-center pointer-events-auto shrink-0">
+              <Power size={14} className={`transition-colors duration-300 ${isOn ? 'text-white' : 'text-white/30'}`} />
+            </button>
+            <button
+              onClick={() => isOn && setViewMode(prev => prev === 'DYNAMIC' ? 'STATIC' : 'DYNAMIC')}
+              className="px-2 h-9 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center border border-black/40"
+            >
+              <span className={`text-[8px] font-black tracking-widest ${isOn ? 'text-yellow-400' : 'text-white/30'}`}>{viewMode}</span>
+            </button>
+            <div className="flex-1"></div>
+            <span className="text-[9px] font-bold text-white/60">{currentIndex + 1}/{items.length}</span>
           </div>
 
-          <div className="flex gap-2 md:gap-5 w-full md:w-auto md:mr-[4.5rem]">
-            <div className="flex gap-2 md:gap-0 flex-1 md:flex-auto">
+          {/* TRUSTED BY Carousel - Mobile compact */}
+          <div className="px-1">
+            <div className="text-[8px] font-black tracking-widest text-white/40 uppercase mb-1">Trusted by</div>
+            <div className="relative h-10 w-full overflow-hidden rounded-lg bg-white border border-white/10 flex items-center justify-center shadow-inner">
+              {(() => {
+                const logoItems = ['Sleepycat', 'MomCozy', 'Optm', 'Varco'];
+                const item = logoItems[logoSlideIndex];
+                const logoImg = brandImages[`${item}_logo`]?.[0];
+                if (!logoImg) return null;
+                const isOptm = item === 'Optm';
+                return (
+                  <div key={item} className={`absolute inset-0 flex items-center justify-center animate-fadeIn p-1 ${isOptm ? 'bg-[#1a1a1a]' : ''}`}>
+                    <div className={`relative w-full h-full ${isOptm ? 'scale-100' : ''}`}>
+                      <Image src={logoImg} alt={item} fill className="object-contain drop-shadow-[0_0_1px_rgba(0,0,0,0.3)]" sizes="120px" />
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+
+        {/* --- Top Control Bar --- */}
+        <div className="hidden md:flex md:justify-between md:items-start mb-4 px-2 relative z-[110] pointer-events-auto gap-0 w-full">
+          <div>
+            <h1 className="text-white text-2xl font-black tracking-tight drop-shadow-sm">SUNIL</h1>
+            <p className="text-white/70 text-[9px] font-bold tracking-[0.2em] uppercase mt-0.5">Graphic Desginer & Video Editor</p>
+            <p className="text-white/50 text-[10px] font-medium tracking-widest mt-1">sunildesign.co@gmail.com</p>
+          </div>
+
+          <div className="flex gap-5 mr-[4.5rem]">
+            <div className="flex gap-0">
               {(['ALL', 'BKM', 'MOR'] as const).map((label) => {
                 const isActive = isOn && activeCategory === label;
                 return (
                   <button
                     key={label}
                     onClick={() => toggleCategory(label)}
-                    className="flex flex-col items-center gap-1 md:gap-2 group outline-none pointer-events-auto flex-1 md:flex-auto"
+                    className="flex flex-col items-center gap-2 group outline-none pointer-events-auto"
                   >
                     <div className={`
-                      w-6 h-6 md:w-9 md:h-9 rounded-full 
+                      w-9 h-9 rounded-full 
                       bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a]
                       shadow-[inset_0_1px_2px_rgba(255,255,255,0.1),0_4px_8px_rgba(0,0,0,0.5)]
                       flex items-center justify-center 
@@ -177,9 +216,9 @@ export default function VidclueFinalPage() {
                       border border-black/40
                       group-hover:border-white/20
                     `}>
-                      <div className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 ${isActive ? 'bg-[#ffcc00] shadow-[0_0_10px_#ffcc00]' : 'bg-[#4a4a4a]'}`}></div>
+                      <div className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${isActive ? 'bg-[#ffcc00] shadow-[0_0_10px_#ffcc00]' : 'bg-[#4a4a4a]'}`}></div>
                     </div>
-                    <span className={`text-[8px] md:text-[9px] font-bold tracking-wider transition-colors ${isActive ? 'text-white' : 'text-white/50'}`}>{label}</span>
+                    <span className={`text-[9px] font-bold tracking-wider transition-colors ${isActive ? 'text-white' : 'text-white/50'}`}>{label}</span>
                   </button>
                 );
               })}
@@ -187,21 +226,21 @@ export default function VidclueFinalPage() {
 
             <button
               onClick={() => isOn && setViewMode(prev => prev === 'DYNAMIC' ? 'STATIC' : 'DYNAMIC')}
-              className="flex flex-col items-center gap-1 md:gap-2 group outline-none md:ml-4 pointer-events-auto flex-1 md:flex-auto"
+              className="flex flex-col items-center gap-2 group outline-none ml-4 pointer-events-auto"
             >
-              <div className="px-2 md:px-3 h-6 md:h-9 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center border border-black/40 group-hover:border-white/20">
-                <span className={`text-[8px] md:text-[10px] font-black tracking-widest ${isOn ? 'text-yellow-400' : 'text-white/30'}`}>{viewMode}</span>
+              <div className="px-3 h-9 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center border border-black/40 group-hover:border-white/20">
+                <span className={`text-[10px] font-black tracking-widest ${isOn ? 'text-yellow-400' : 'text-white/30'}`}>{viewMode}</span>
               </div>
-              <span className="text-[8px] md:text-[9px] font-bold tracking-wider text-white/50">MODE</span>
+              <span className="text-[9px] font-bold tracking-wider text-white/50">MODE</span>
             </button>
           </div>
         </div>
 
         {/* --- Main Interface Area --- */}
-        <div className="flex-1 flex flex-col md:flex-row md:gap-5 relative z-[100] min-h-0 pointer-events-auto h-auto md:h-auto gap-2">
+        <div className="flex-1 flex flex-col md:flex-row md:gap-5 relative z-[100] min-h-0 pointer-events-auto md:min-h-[80vh] gap-2">
 
-          {/* Left Sidebar */}
-          <div className={`flex-[0.9] md:flex-[0.9] w-full md:w-auto rounded-2xl overflow-hidden flex flex-col border-2 border-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] transition-colors duration-300 relative h-64 md:h-auto ${isOn ? 'bg-[#151515]' : 'bg-[#0d0d0d]'}`}>
+          {/* Left Sidebar - Hidden on Mobile */}
+          <div className={`hidden md:flex flex-[0.9] rounded-2xl overflow-hidden flex-col border-2 border-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] transition-colors duration-300 relative ${isOn ? 'bg-[#151515]' : 'bg-[#0d0d0d]'}`}>
             <div className={`h-full flex flex-col transition-opacity duration-300 relative z-0 ${isOn ? 'opacity-100' : 'opacity-20'}`}>
               <div
                 className="p-5 flex items-center justify-between border-b border-white/5 pr-6 bg-[#1a1a1a] cursor-pointer hover:bg-white/5 transition"
@@ -333,7 +372,7 @@ export default function VidclueFinalPage() {
             </div>
           </div>
 
-          <div className={`flex-1 md:flex-1 w-full md:w-auto rounded-2xl overflow-hidden flex flex-col border-2 border-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.2)] transition-colors duration-300 relative h-64 md:h-auto ${isOn ? 'bg-[#e0e0e0]' : 'bg-[#1a1a1a]'}`}>
+          <div className={`hidden md:flex flex-1 rounded-2xl overflow-hidden flex-col border-2 border-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.2)] transition-colors duration-300 relative ${isOn ? 'bg-[#e0e0e0]' : 'bg-[#1a1a1a]'}`}>
             <div className={`h-full flex flex-col relative transition-opacity duration-300 z-0 ${isOn ? 'opacity-100' : 'opacity-0'}`}>
               <div className="h-14 bg-[#151515] flex items-center justify-between px-5 shrink-0">
                 <div className="flex items-center gap-3 text-white">
@@ -423,31 +462,61 @@ export default function VidclueFinalPage() {
           </div>
         </div>
 
-        {/* Mobile Bottom Controls */}
-        <div className="flex md:hidden flex-col gap-2 w-full">
-          {/* Power Button & Mode - Mobile */}
-          <div className="flex gap-2 items-center justify-between bg-[#1a1a1a] rounded-lg p-2">
-            <button onClick={() => setIsOn(!isOn)} className="w-10 h-10 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] border border-black/40 shadow-[0_4px_6px_rgba(0,0,0,0.4)] flex items-center justify-center pointer-events-auto">
-              <Power size={16} className={`transition-colors duration-300 ${isOn ? 'text-white' : 'text-white/30'}`} />
-            </button>
-            <button
-              onClick={() => isOn && setViewMode(prev => prev === 'DYNAMIC' ? 'STATIC' : 'DYNAMIC')}
-              className="flex-1 px-3 h-10 rounded-lg bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center border border-black/40 group-hover:border-white/20"
-            >
-              <span className={`text-[10px] font-black tracking-widest ${isOn ? 'text-yellow-400' : 'text-white/30'}`}>{viewMode}</span>
-            </button>
-          </div>
+        {/* Mobile Content Area */}
+        <div className={`flex md:hidden flex-1 rounded-xl overflow-hidden border-2 border-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.2)] transition-colors duration-300 relative min-h-[250px] ${isOn ? 'bg-[#1a1a1a]' : 'bg-[#0d0d0d]'}`}>
+          <div className={`h-full w-full flex items-center justify-center relative transition-opacity duration-300 ${isOn ? 'opacity-100' : 'opacity-20'}`}>
+            {(() => {
+              const imgs = (() => {
+                if (viewAllCategory === 'social') return items.slice(0, 4).flatMap(it => brandImages[it] || []);
+                if (viewAllCategory === 'thumbnails') return items.slice(4, 8).flatMap(it => brandImages[it] || []);
+                if (viewAllCategory === 'videos') return items.slice(8).flatMap(it => [`https://img.youtube.com/vi/${videoData[it].id}/mqdefault.jpg`]);
+                if (viewAllCategory === 'logos') return ['Sleepycat', 'MomCozy', 'Optm', 'Varco'].flatMap(it => brandImages[`${it}_logo`] || []);
+                return brandImages[currentBrand];
+              })();
 
-          {/* Slide Navigation - Mobile */}
-          <div className="flex items-center gap-2 bg-[#1a1a1a] rounded-lg p-2">
-            <button onClick={() => setCurrentIndex(i => (i > 0 ? i - 1 : items.length - 1))} className="w-10 h-10 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] border border-black/40 flex items-center justify-center pointer-events-auto">
-              <ChevronUp size={16} className="text-white/50" />
+              if (!viewAllCategory && currentIndex >= 8) {
+                const vid = videoData[items[currentIndex]];
+                return (
+                  <div className="w-full h-full relative p-2">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${vid.id}?start=${vid.start || 0}&autoplay=0&rel=0`}
+                      title={items[currentIndex]}
+                      className="w-full h-full rounded-lg border-2 border-black/20"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                );
+              }
+
+              if (!imgs || imgs.length === 0) {
+                return (
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <FileX size={48} className="text-neutral-400/70" strokeWidth={1.2} />
+                    <p className="text-neutral-400 text-xs mt-2 font-medium">No images</p>
+                  </div>
+                );
+              }
+
+              const activeSrc = imgs[slideIndex];
+              return (
+                <div className="relative w-full h-full flex items-center justify-center p-3">
+                  <Image src={activeSrc} alt="" fill className="object-contain" sizes="300px" />
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+
+        {/* Mobile Bottom Navigation */}
+        <div className="flex md:hidden flex-col gap-2 w-full">
+          <div className="flex items-center gap-2 bg-[#1a1a1a] rounded-lg p-2 justify-between">
+            <button onClick={() => setCurrentIndex(i => (i > 0 ? i - 1 : items.length - 1))} className="w-8 h-8 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] border border-black/40 flex items-center justify-center pointer-events-auto">
+              <ChevronLeft size={14} className="text-white/50" />
             </button>
-            <div className="flex-1 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-white/60">{currentIndex + 1}/{items.length}</span>
-            </div>
-            <button onClick={() => setCurrentIndex(i => (i < items.length - 1 ? i + 1 : 0))} className="w-10 h-10 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] border border-black/40 flex items-center justify-center pointer-events-auto">
-              <ChevronDown size={16} className="text-white/50" />
+            <span className="text-[10px] font-bold text-white/60">{currentBrand}</span>
+            <button onClick={() => setCurrentIndex(i => (i < items.length - 1 ? i + 1 : 0))} className="w-8 h-8 rounded-full bg-gradient-to-b from-[#3a3a3a] to-[#1a1a1a] border border-black/40 flex items-center justify-center pointer-events-auto">
+              <ChevronRight size={14} className="text-white/50" />
             </button>
           </div>
         </div>
