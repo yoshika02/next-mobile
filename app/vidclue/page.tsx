@@ -28,6 +28,18 @@ const videoData: Record<string, { id: string, start?: number }> = {
 };
 const videoItems = Object.keys(videoData);
 
+const shortsData: Record<string, { id: string }> = {
+  'Short #1': { id: 'Ka5U-YW9Nwo' },
+  'Short #2': { id: 'WQzaSv_r3aE' },
+  'Short #3': { id: 'aY0LXl73osc' },
+  'Short #4': { id: 'j98ALVG0Xek' },
+  'Short #5': { id: 'iKSJQ75i1x8' },
+  'Short #6': { id: 'kicGfCUAaKU' },
+  'Short #7': { id: 'D5v82XSN9NU' },
+  'Short #8': { id: 'HN8Pi0IjhH8' },
+};
+const shortsItems = Object.keys(shortsData);
+
 const brandImages: Record<string, string[]> = {
   Sleepycat: Array.from({ length: 18 }, (_, i) => `/brands/sleepcat/sleepcat_${i + 1}.${sleepExt[i + 1] ?? 'jpg'}`),
   MomCozy: Array.from({ length: 17 }, (_, i) => `/brands/momcozy/momcozy_${i + 1}.jpg`),
@@ -50,9 +62,10 @@ export default function VidclueFinalPage() {
   const [isSocialAdsOpen, setIsSocialAdsOpen] = useState(true);
   const [isThumbnailsOpen, setIsThumbnailsOpen] = useState(true);
   const [isVideosOpen, setIsVideosOpen] = useState(true);
+  const [isShortsOpen, setIsShortsOpen] = useState(true);
   const [isLogosOpen, setIsLogosOpen] = useState(false);
-  const [viewAllCategory, setViewAllCategory] = useState<null | 'social' | 'thumbnails' | 'videos' | 'logos'>(null);
-  const [expandedInline, setExpandedInline] = useState<null | 'social' | 'thumbnails' | 'videos'>(null);
+  const [viewAllCategory, setViewAllCategory] = useState<null | 'social' | 'thumbnails' | 'videos' | 'shorts' | 'logos'>(null);
+  const [expandedInline, setExpandedInline] = useState<null | 'social' | 'thumbnails' | 'videos' | 'shorts'>(null);
   const [logoSlideIndex, setLogoSlideIndex] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
   const [viewMode, setViewMode] = useState<'DYNAMIC' | 'STATIC'>('DYNAMIC');
@@ -67,25 +80,30 @@ export default function VidclueFinalPage() {
     'Coworker wisdom',
     'Multi-role explainer',
     'Explain like I\'m five',
-    ...videoItems
+    ...videoItems,
+    ...shortsItems
   ];
 
   const currentBrand = items[currentIndex];
 
   // Aggregate images if in "Show All" mode
+  const videoCount = videoItems.length;
+  const shortsStartIdx = 8 + videoCount;
+
   const currentBrandImgs = (() => {
     if (viewAllCategory === 'social') return items.slice(0, 4).flatMap(it => brandImages[it] || []);
     if (viewAllCategory === 'thumbnails') return items.slice(4, 8).flatMap(it => brandImages[it] || []);
-    if (viewAllCategory === 'videos') return items.slice(8).flatMap(it => [`https://img.youtube.com/vi/${videoData[it].id}/mqdefault.jpg`]);
+    if (viewAllCategory === 'videos') return videoItems.flatMap(it => [`https://img.youtube.com/vi/${videoData[it].id}/mqdefault.jpg`]);
+    if (viewAllCategory === 'shorts') return shortsItems.flatMap(it => [`https://img.youtube.com/vi/${shortsData[it].id}/mqdefault.jpg`]);
     if (viewAllCategory === 'logos') return ['Sleepycat', 'MomCozy', 'Optm', 'Varco'].flatMap(it => brandImages[`${it}_logo`] || []);
-    const itemKey = currentIndex >= 8 ? currentBrand : currentBrand;
-    return brandImages[itemKey];
+    return brandImages[currentBrand];
   })();
 
   const currentDisplayName = (() => {
     if (viewAllCategory === 'social') return "ALL SOCIAL + ADS";
     if (viewAllCategory === 'thumbnails') return "ALL THUMBNAILS";
     if (viewAllCategory === 'videos') return "ALL VIDEOS";
+    if (viewAllCategory === 'shorts') return "ALL SHORTS";
     if (viewAllCategory === 'logos') return "ALL PARTNERS";
     return currentBrand;
   })();
@@ -354,7 +372,7 @@ export default function VidclueFinalPage() {
                   </div>
                 </div>
 
-                {isVideosOpen && items.slice(8).map((item, idx) => {
+                {isVideosOpen && items.slice(8, shortsStartIdx).map((item, idx) => {
                   const actualIdx = idx + 8;
                   const isActive = currentIndex === actualIdx;
                   const vid = videoData[item];
@@ -371,6 +389,7 @@ export default function VidclueFinalPage() {
                         setIsSocialAdsOpen(false);
                         setIsThumbnailsOpen(false);
                         setIsVideosOpen(false);
+                        setIsShortsOpen(false);
                       }
                     }
                     setLastClickTime(now);
@@ -383,6 +402,54 @@ export default function VidclueFinalPage() {
                         }`}
                     >
                       <div className={`w-10 h-7 rounded border border-white/10 overflow-hidden relative shrink-0 ${(isActive && !viewAllCategory) ? 'ring-1 ring-yellow-400/50' : ''}`}>
+                        <Image src={previewImg} alt="" fill className="object-cover" unoptimized />
+                      </div>
+                      <span className="text-xs font-medium tracking-wide truncate">{item}</span>
+                      {(isActive && !viewAllCategory) && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#e03e3e]" />}
+                    </button>
+                  );
+                })}
+
+                {/* --- SHORTS Section --- */}
+                <div
+                  className={`p-5 flex items-center justify-between mt-2 border-t border-white/5 bg-[#1a1a1a] cursor-pointer hover:bg-white/5 transition ${viewAllCategory === 'shorts' ? 'ring-inset ring-1 ring-yellow-500/30' : ''}`}
+                  onClick={() => { setIsShortsOpen(!isShortsOpen); setViewAllCategory('shorts'); }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`text-[10px] font-bold tracking-widest uppercase ${viewAllCategory === 'shorts' ? 'text-yellow-400' : 'text-white/50'}`}>4. SHORTS</div>
+                    {isShortsOpen ? <ChevronUp size={14} className="text-white/40" /> : <ChevronDown size={14} className="text-white/40" />}
+                  </div>
+                </div>
+
+                {isShortsOpen && items.slice(shortsStartIdx).map((item, idx) => {
+                  const actualIdx = idx + shortsStartIdx;
+                  const isActive = currentIndex === actualIdx;
+                  const short = shortsData[item];
+                  const previewImg = `https://img.youtube.com/vi/${short.id}/mqdefault.jpg`;
+                  const handleClick = () => {
+                    const now = Date.now();
+                    if (now - lastClickTime < 300) {
+                      setExpandedInline(expandedInline === 'shorts' ? null : 'shorts');
+                    } else {
+                      setCurrentIndex(actualIdx);
+                      setViewAllCategory(null);
+                      if (window.innerWidth < 768) {
+                        setIsSocialAdsOpen(false);
+                        setIsThumbnailsOpen(false);
+                        setIsVideosOpen(false);
+                        setIsShortsOpen(false);
+                      }
+                    }
+                    setLastClickTime(now);
+                  };
+                  return (
+                    <button
+                      key={actualIdx}
+                      onClick={handleClick}
+                      className={`w-full text-left px-6 py-3 transition-all relative flex items-center gap-4 group ${isActive && !viewAllCategory ? 'bg-white/5 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'
+                        }`}
+                    >
+                      <div className={`w-7 h-10 rounded border border-white/10 overflow-hidden relative shrink-0 ${(isActive && !viewAllCategory) ? 'ring-1 ring-yellow-400/50' : ''}`}>
                         <Image src={previewImg} alt="" fill className="object-cover" unoptimized />
                       </div>
                       <span className="text-xs font-medium tracking-wide truncate">{item}</span>
@@ -446,9 +513,13 @@ export default function VidclueFinalPage() {
                       if (expandedInline === 'thumbnails' && currentIndex >= 4 && currentIndex < 8) {
                         gridItems = brandImages[currentItem] || [];
                       }
-                      if (expandedInline === 'videos' && currentIndex >= 8) {
+                      if (expandedInline === 'videos' && currentIndex >= 8 && currentIndex < shortsStartIdx) {
                         const vid = videoData[currentItem];
                         gridItems = vid ? [`https://img.youtube.com/vi/${vid.id}/mqdefault.jpg`] : [];
+                      }
+                      if (expandedInline === 'shorts' && currentIndex >= shortsStartIdx) {
+                        const short = shortsData[currentItem];
+                        gridItems = short ? [`https://img.youtube.com/vi/${short.id}/mqdefault.jpg`] : [];
                       }
 
                       return gridItems.map((imgSrc, i) => (
@@ -468,6 +539,24 @@ export default function VidclueFinalPage() {
               <div className="flex-1 relative bg-[#111] shadow-inner overflow-hidden flex items-center justify-center pointer-events-auto">
                 {(() => {
                   const imgs = currentBrandImgs;
+
+                  // Check if current item is a short
+                  if (!viewAllCategory && currentIndex >= shortsStartIdx) {
+                    const short = shortsData[items[currentIndex]];
+                    return (
+                      <div className="w-full h-full relative flex items-center justify-center p-4">
+                        <div className="h-full max-h-full aspect-[9/16] relative">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${short.id}?autoplay=0&rel=0`}
+                            title={items[currentIndex]}
+                            className="w-full h-full rounded-xl border-4 border-black/20 shadow-2xl"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
 
                   // Check if current item is a video
                   if (!viewAllCategory && currentIndex >= 8) {
